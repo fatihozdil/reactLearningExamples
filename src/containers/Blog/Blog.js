@@ -1,13 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component,Suspense } from 'react';
 import './Blog.css';
 import Posts from './Posts/Posts';
 import { Route, NavLink, Switch,Redirect } from 'react-router-dom';
 //import NewPost from './NewPost/NewPost';
-import asyncComponent from '../../hoc/asyncComponent';
+//import asyncComponent from '../../hoc/asyncComponent';
 
-const AsyncNewPost = asyncComponent(() => {
+/* const AsyncNewPost = asyncComponent(() => {
     return import('./NewPost/NewPost')
-})
+}) */
+
+const NewPosts = React.lazy(() => import('./NewPost/NewPost'));
+
 class Blog extends Component {
 state={
     auth: true
@@ -37,7 +40,12 @@ state={
                 {/* <Route path="/" exact render={()=> <h1>Home</h1>}/>
                   <Route path="/" render={()=> <h1>Home</h1>}/> */}
                 <Switch>
-                    {this.state.auth?<Route path="/new-post" component={AsyncNewPost} />:null}
+                    {this.state.auth?<Route path="/new-post" render={()=> (
+                        <Suspense fallback={<div>loading.... </div>}>
+                            <NewPosts/>
+                        </Suspense>
+                    )
+                    } />:null}
                     <Route path="/posts/"  component={Posts} />
                     {/* <Route render={()=> <h1>not found</h1>}/> */} {/* we can use this way to redirect or render something end of the route path 
                     but we cant use this redirecting way with redirect component */}
